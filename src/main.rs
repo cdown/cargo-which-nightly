@@ -7,10 +7,10 @@ use std::collections::HashMap;
 #[derive(Parser, Debug)]
 #[command(bin_name = "cargo which-nightly", author, version, about, long_about = None)]
 pub struct Config {
-    #[arg(long, default_value=current_platform::CURRENT_PLATFORM)]
+    #[arg(long, default_value=current_platform::CURRENT_PLATFORM, help="The target triple to check")]
     target: String,
 
-    #[arg(required = true, num_args = 1..)]
+    #[arg(required = true, num_args = 1.., help="The feature(s) to find available versions for")]
     features: Vec<String>,
 }
 
