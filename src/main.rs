@@ -1,11 +1,22 @@
 use anyhow::{bail, Result};
 use chrono::NaiveDate;
+use clap::Parser;
 use serde_json::Value;
 use std::collections::HashMap;
 
-async fn feature_dates(feature: String, host: String) -> Result<Vec<NaiveDate>> {
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+pub struct Config {
+    #[arg(long, default_value=current_platform::CURRENT_PLATFORM)]
+    target: String,
+
+    #[arg(required = true, num_args = 1..)]
+    features: Vec<String>,
+}
+
+async fn feature_dates(feature: String, target: String) -> Result<Vec<NaiveDate>> {
     let url =
-        format!("https://rust-lang.github.io/rustup-components-history/{host}/{feature}.json");
+        format!("https://rust-lang.github.io/rustup-components-history/{target}/{feature}.json");
     let response = reqwest::get(&url).await?;
     let data: HashMap<String, Value> = response.json().await?;
     let avail_dates = data
@@ -44,13 +55,10 @@ async fn latest_common_nightly(features: Vec<String>, host: String) -> Result<Na
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    let cfg = Config::parse();
     println!(
         "{}",
-        latest_common_nightly(
-            vec!["miri".to_owned(), "clippy".to_owned(), "rls".to_owned()],
-            "x86_64-unknown-linux-gnu".to_owned()
-        )
-        .await?
+        latest_common_nightly(cfg.features, cfg.target,).await?
     );
     Ok(())
 }
