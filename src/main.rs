@@ -1,5 +1,4 @@
-use anyhow::{bail, Result};
-use chrono::NaiveDate;
+use anyhow::{bail, Context, Result};
 use clap::Parser;
 use rayon::prelude::*;
 use serde_json::Value;
@@ -15,29 +14,33 @@ pub struct Config {
     features: Vec<String>,
 }
 
-fn feature_dates(feat: &str, target: &str) -> Result<Vec<NaiveDate>> {
+fn feature_dates(feat: &str, target: &str) -> Result<Vec<String>> {
     let url = format!("https://rust-lang.github.io/rustup-components-history/{target}/{feat}.json");
     let res = ureq::get(&url).call()?;
     let data: HashMap<String, Value> = res.into_json()?;
     Ok(data
         .into_iter()
-        .filter(|(_, value)| *value == serde_json::Value::Bool(true))
-        .filter_map(|(key, _)| NaiveDate::parse_from_str(&key, "%Y-%m-%d").ok())
+        .filter_map(|(key, value)| {
+            if value == serde_json::Value::Bool(true) {
+                Some(key)
+            } else {
+                None
+            }
+        })
         .collect())
 }
 
-fn latest_common_nightly(features: &[String], host: &str) -> Result<NaiveDate> {
-    if features.is_empty() {
-        bail!("No features provided");
-    }
+fn latest_common_nightly(features: &[String], host: &str) -> Result<String> {
     let mut feat_dates: Vec<_> = features
         .into_par_iter() // for the number of items we have, much faster than async
         .map(|f| feature_dates(f, host))
         .collect::<Result<_>>()?;
-    feat_dates[0].sort_by(|a, b| b.cmp(a)); // Latest first
-    for date in &feat_dates[0] {
-        if feat_dates[1..].iter().all(|dates| dates.contains(date)) {
-            return Ok(*date);
+
+    let mut tail = feat_dates.pop().context("No features provided")?;
+    tail.sort_by(|a, b| b.cmp(a)); // Latest first
+    for date in tail {
+        if feat_dates.iter().all(|dates| dates.contains(&date)) {
+            return Ok(date);
         }
     }
     bail!("No common dates found")

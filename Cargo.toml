@@ -13,7 +13,6 @@ rust-version = "1.64.0"
 
 [dependencies]
 anyhow = "1.0.71"
-chrono = { version = "0.4.24", default-features = false }
 clap = { version = "4.2.7", features = ["derive"] }
 current_platform = "0.2.0"
 rayon = "1.7.0"
