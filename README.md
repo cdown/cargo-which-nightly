@@ -11,3 +11,8 @@ features.
 You can get this nightly with:
 
     % rustup default nightly-"$(cargo which-nightly miri rls clippy)"
+
+The current compiled platform is assumed as the target. If you want to check
+another, pass `--target`:
+
+    % cargo which-nightly --target aarch64-unknown-linux-gnu miri rls clippy
