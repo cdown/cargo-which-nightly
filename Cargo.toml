@@ -2,6 +2,14 @@
 name = "cargo-which-nightly"
 version = "0.1.0"
 edition = "2021"
+authors = ["Chris Down <chris@chrisdown.name>"]
+description = "Find the latest Rust nightly with combinations of features present."
+repository = "https://github.com/cdown/cargo-which-nightly"
+readme = "README.md"
+keywords = ["cargo", "update", "plugin", "subcommand"]
+categories = ["development-tools::cargo-plugins"]
+license = "MIT"
+rust-version = "1.64.0"
 
 [dependencies]
 anyhow = "1.0.71"
