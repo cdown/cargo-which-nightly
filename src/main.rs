@@ -17,8 +17,13 @@ pub struct Config {
 async fn feature_dates(feature: String, target: String) -> Result<Vec<NaiveDate>> {
     let url =
         format!("https://rust-lang.github.io/rustup-components-history/{target}/{feature}.json");
-    let response = reqwest::get(&url).await?;
-    let data: HashMap<String, Value> = response.json().await?;
+    let res = reqwest::get(&url).await?;
+    let status = res.status();
+    let data: HashMap<String, Value> = if !res.status().is_success() {
+        bail!("{url}: Got status {status:?}");
+    } else {
+        res.json().await?
+    };
     let avail_dates = data
         .into_iter()
         .filter(|(_, value)| *value == serde_json::Value::Bool(true))
