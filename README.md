@@ -8,7 +8,7 @@ features.
     % cargo which-nightly miri rls clippy
     2023-05-04
 
-You can get this nightly with:
+You can set this nightly as the default with:
 
     % rustup default nightly-"$(cargo which-nightly miri rls clippy)"
 
