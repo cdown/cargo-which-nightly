@@ -3,6 +3,7 @@ use clap::Parser;
 use rayon::prelude::*;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::process::{Command, Stdio};
 
 #[derive(Parser, Debug)]
 #[command(bin_name = "cargo which-nightly", author, version, about, long_about = None)]
@@ -12,6 +13,22 @@ pub struct Config {
 
     #[arg(required = true, num_args = 1.., help = "The feature(s) to find available versions for")]
     features: Vec<String>,
+
+    #[arg(long, help = "Set the found nightly as the default with rustup")]
+    set_default: bool,
+}
+
+fn set_default(date: &str) -> Result<()> {
+    let status = Command::new("rustup")
+        .arg("default")
+        .arg(format!("nightly-{date}"))
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .status()?;
+    if !status.success() {
+        bail!("Failed to set default toolchain to nightly-{}", date);
+    }
+    Ok(())
 }
 
 fn feature_dates(feat: &str, target: &str) -> Result<Vec<String>> {
@@ -52,6 +69,11 @@ fn main() -> Result<()> {
         args.remove(1);
     }
     let cfg = Config::parse_from(args);
-    println!("{}", latest_common_nightly(&cfg.features, &cfg.target)?);
+    let date = latest_common_nightly(&cfg.features, &cfg.target)?;
+    if cfg.set_default {
+        set_default(&date)?;
+    } else {
+        println!("{date}");
+    }
     Ok(())
 }
