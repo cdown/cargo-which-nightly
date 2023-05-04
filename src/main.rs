@@ -5,7 +5,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(bin_name = "cargo which-nightly", author, version, about, long_about = None)]
 pub struct Config {
     #[arg(long, default_value=current_platform::CURRENT_PLATFORM)]
     target: String,
@@ -60,7 +60,11 @@ async fn latest_common_nightly(features: Vec<String>, host: String) -> Result<Na
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let cfg = Config::parse();
+    let mut args: Vec<String> = std::env::args().collect();
+    if args.get(1) == Some(&"which-nightly".to_string()) {
+        args.remove(1);
+    }
+    let cfg = Config::parse_from(args);
     println!(
         "{}",
         latest_common_nightly(cfg.features, cfg.target,).await?
