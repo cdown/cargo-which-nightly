@@ -31,6 +31,12 @@ fn set_default(date: &str) -> Result<()> {
     Ok(())
 }
 
+/// A naive date check. No need to depend on `chrono::NaiveDate` -- worst case we just get provided
+/// something bogus.
+fn is_date(date: &str) -> bool {
+    date.len() == "0000-00-00".len() && date.chars().all(|c| c.is_ascii_digit() || c == '-')
+}
+
 fn feature_dates(feat: &str, target: &str) -> Result<Vec<String>> {
     let url = format!("https://rust-lang.github.io/rustup-components-history/{target}/{feat}.json");
     let res = ureq::get(&url).call()?;
@@ -38,7 +44,7 @@ fn feature_dates(feat: &str, target: &str) -> Result<Vec<String>> {
     Ok(data
         .into_iter()
         .filter_map(|(key, value)| {
-            if value == serde_json::Value::Bool(true) {
+            if is_date(&key) && value == serde_json::Value::Bool(true) {
                 Some(key)
             } else {
                 None
