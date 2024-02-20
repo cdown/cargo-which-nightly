@@ -16,5 +16,5 @@ anyhow = "1.0.75"
 clap = { version = "4.4.8", features = ["std", "derive", "help"], default-features = false }
 current_platform = "0.2.0"
 rayon = "1.8.0"
-serde_json = { version = "1.0.108", default-features = false }
+serde_json = { version = "1.0.114", default-features = false }
 ureq = { version = "2.9.1", features = ["json", "tls"], default-features = false }
