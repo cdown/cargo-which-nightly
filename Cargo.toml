@@ -9,12 +9,12 @@ readme = "README.md"
 keywords = ["cargo", "update", "plugin", "subcommand"]
 categories = ["development-tools::cargo-plugins"]
 license = "MIT"
-rust-version = "1.64.0"
+rust-version = "1.74"
 
 [dependencies]
-anyhow = "1.0.75"
-clap = { version = "4.4.8", features = ["std", "derive", "help"], default-features = false }
+anyhow = "1.0.93"
+clap = { version = "4.5.20", features = ["std", "derive", "help"], default-features = false }
 current_platform = "0.2.0"
-rayon = "1.8.0"
-serde_json = { version = "1.0.108", default-features = false }
-ureq = { version = "2.9.1", features = ["json", "tls"], default-features = false }
+rayon = "1.10.0"
+serde_json = { version = "1.0.132", default-features = false }
+ureq = { version = "2.10.1", features = ["json", "tls"], default-features = false }
